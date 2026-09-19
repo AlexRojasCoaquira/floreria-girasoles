@@ -1,34 +1,74 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 export default function CartaPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [showCard, setShowCard] = useState(false);
-  const [sparkles, setSparkles] = useState<
-    { id: number; left: number; delay: number; size: number; duration: number }[]
+  const [fallingFlowers, setFallingFlowers] = useState<
+    {
+      id: number;
+      left: number;
+      delay: number;
+      size: number;
+      duration: number;
+      variant: number;
+    }[]
   >([]);
+  const [showFlowers, setShowFlowers] = useState(false);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Generate floating luxury golden petals & motes when opened
+    // Nevada infinita de girasoles: orden 100% ALEATORIO de caída desde arriba (sin barrido de izq a der)
     if (isOpen) {
-      const generated = Array.from({ length: 26 }).map((_, i) => ({
+      const count = 40;
+      // Posiciones horizontales que cubren la pantalla de forma equilibrada
+      const positions = Array.from(
+        { length: count },
+        (_, i) => ((i * (92 / count) + Math.random() * 2.5) % 90) + 5,
+      );
+      // Barajado aleatorio (Fisher-Yates) para que los girasoles caigan en orden completamente impredecible
+      for (let i = positions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [positions[i], positions[j]] = [positions[j], positions[i]];
+      }
+
+      const generated = Array.from({ length: count }).map((_, i) => ({
         id: i,
-        left: Math.random() * 92 + 4,
-        delay: Math.random() * 2.5,
-        size: Math.random() * 14 + 12,
-        duration: Math.random() * 3 + 4,
+        // Posición horizontal completamente aleatoria (nunca en secuencia de izquierda a derecha)
+        left: positions[i],
+        // Entrada escalonada natural desde arriba
+        delay: i * 0.22 + Math.random() * 0.16,
+        size: Math.floor(Math.random() * 100 + 54), // 54px a 82px
+        duration: Math.random() * 1.6 + 5.6, // Caída suave de ~5.6s a 7.2s
+        variant: Math.floor(Math.random() * 3), // Variante de bamboleo aleatoria
       }));
-      setSparkles(generated);
+      setFallingFlowers(generated);
+      setShowFlowers(true);
     } else {
-      setSparkles([]);
+      setShowFlowers(false);
+      setFallingFlowers([]);
     }
   }, [isOpen]);
 
   const handleOpen = () => {
     if (isOpen) return;
     setIsOpen(true);
+
+    // Reproducir audio flores.mp3 al abrir el sobre
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current
+        .play()
+        .then(() => setIsPlayingAudio(true))
+        .catch((err) => {
+          console.log("Audio playback notice:", err);
+        });
+    }
+
     // Smooth sequence: envelope straightens and opens first, then letter smoothly glides out
     setTimeout(() => {
       setShowCard(true);
@@ -39,6 +79,13 @@ export default function CartaPage() {
     if (e) e.stopPropagation();
     // Smooth sequence: letter glides down inside first, then envelope closes and returns to tilted rest
     setShowCard(false);
+
+    // Pausar audio si se cierra el sobre
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlayingAudio(false);
+    }
+
     setTimeout(() => {
       setIsOpen(false);
     }, 550);
@@ -52,8 +99,32 @@ export default function CartaPage() {
     }
   };
 
+  const toggleAudio = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!audioRef.current) return;
+    if (audioRef.current.paused) {
+      audioRef.current
+        .play()
+        .then(() => setIsPlayingAudio(true))
+        .catch(() => {});
+    } else {
+      audioRef.current.pause();
+      setIsPlayingAudio(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_center,_#faf7f0_0%,_#f5eee1_50%,_#ebe0cc_100%)] flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden select-none font-sans text-stone-800">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_center,_#fffdf2_0%,_#fef4cc_32%,_#fae498_65%,_#d97706_100%)] flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden select-none font-sans text-stone-800">
+      {/* Audio element for flores.mp3 */}
+      <audio
+        ref={audioRef}
+        src="/flores.mp3"
+        preload="auto"
+        loop
+        onPlay={() => setIsPlayingAudio(true)}
+        onPause={() => setIsPlayingAudio(false)}
+      />
+
       {/* Google Fonts for luxury calligraphy and classic serifs */}
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap");
@@ -132,31 +203,108 @@ export default function CartaPage() {
         }
 
         .animate-envelope-tilted-pulse {
-          animation: envelope-heartbeat-tilted 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+          animation: envelope-heartbeat-tilted 2.4s
+            cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
         }
 
-        /* Floating yellow petals & sparkles */
-        @keyframes float-petal {
+        /* Animación estilo nevada de girasoles (ondulación suave sinusoidal y caída ligera) */
+        @keyframes snowfall-sway-1 {
           0% {
-            transform: translateY(105vh) scale(0.6) rotate(0deg);
+            transform: translate3d(0, -20vh, 0) rotate(0deg);
             opacity: 0;
           }
-          15% {
+          10% {
             opacity: 0.95;
           }
-          85% {
+          25% {
+            transform: translate3d(36px, 20vh, 0) rotate(14deg);
+          }
+          50% {
+            transform: translate3d(-32px, 55vh, 0) rotate(-14deg);
+          }
+          75% {
+            transform: translate3d(28px, 88vh, 0) rotate(12deg);
+            opacity: 0.95;
+          }
+          92% {
             opacity: 0.85;
           }
           100% {
-            transform: translateY(-15vh) scale(1.15) rotate(360deg);
+            transform: translate3d(-18px, 126vh, 0) rotate(-8deg);
             opacity: 0;
           }
         }
 
-        .animate-petal {
-          animation-name: float-petal;
-          animation-timing-function: ease-in-out;
+        @keyframes snowfall-sway-2 {
+          0% {
+            transform: translate3d(0, -20vh, 0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.95;
+          }
+          25% {
+            transform: translate3d(-42px, 22vh, 0) rotate(-16deg);
+          }
+          50% {
+            transform: translate3d(38px, 58vh, 0) rotate(15deg);
+          }
+          75% {
+            transform: translate3d(-26px, 90vh, 0) rotate(-12deg);
+            opacity: 0.95;
+          }
+          92% {
+            opacity: 0.85;
+          }
+          100% {
+            transform: translate3d(20px, 126vh, 0) rotate(9deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes snowfall-sway-3 {
+          0% {
+            transform: translate3d(0, -20vh, 0) rotate(-8deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.95;
+          }
+          30% {
+            transform: translate3d(52px, 28vh, 0) rotate(18deg);
+          }
+          60% {
+            transform: translate3d(-48px, 68vh, 0) rotate(-16deg);
+          }
+          85% {
+            transform: translate3d(32px, 96vh, 0) rotate(12deg);
+            opacity: 0.9;
+          }
+          100% {
+            transform: translate3d(-22px, 126vh, 0) rotate(-8deg);
+            opacity: 0;
+          }
+        }
+
+        .animate-snowfall-1 {
+          animation-name: snowfall-sway-1;
+          animation-timing-function: linear;
           animation-iteration-count: infinite;
+          animation-fill-mode: both;
+        }
+
+        .animate-snowfall-2 {
+          animation-name: snowfall-sway-2;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          animation-fill-mode: both;
+        }
+
+        .animate-snowfall-3 {
+          animation-name: snowfall-sway-3;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          animation-fill-mode: both;
         }
 
         @keyframes wax-sun-glow {
@@ -176,36 +324,48 @@ export default function CartaPage() {
         }
       `}</style>
 
-      {/* Ambient background lighting and warm gold flecks */}
+      {/* Ambient background lighting and warm sunflower radiance */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-amber-200/25 rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 left-1/4 w-[550px] h-[550px] bg-yellow-200/30 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-amber-300/15 rounded-full blur-3xl" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[720px] bg-amber-300/35 rounded-full blur-3xl" />
+        <div className="absolute -bottom-32 left-1/4 w-[600px] h-[600px] bg-yellow-300/30 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 right-1/4 w-[450px] h-[450px] bg-amber-400/20 rounded-full blur-3xl" />
+        <div className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-yellow-200/40 rounded-full blur-2xl" />
       </div>
 
-      {/* Background Floating Luxury Yellow Petals & Stardust */}
-      {isOpen && (
-        <div className="fixed inset-0 pointer-events-none z-10">
-          {sparkles.map((h) => (
-            <span
-              key={h.id}
-              className="absolute animate-petal text-amber-500 drop-shadow-md select-none"
+      {/* Nevada Suave de Girasoles Reales al Abrir (Efecto de copos de nieve, dura 5 segundos) */}
+      {isOpen && fallingFlowers.length > 0 && (
+        <div
+          className={`fixed inset-0 pointer-events-none z-30 overflow-hidden transition-opacity duration-1000 ${
+            showFlowers ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {fallingFlowers.map((flower) => (
+            <div
+              key={flower.id}
+              className={`absolute select-none pointer-events-none ${
+                flower.variant === 0
+                  ? "animate-snowfall-1"
+                  : flower.variant === 1
+                    ? "animate-snowfall-2"
+                    : "animate-snowfall-3"
+              }`}
               style={{
-                left: `${h.left}%`,
-                bottom: "-30px",
-                animationDelay: `${h.delay}s`,
-                animationDuration: `${h.duration}s`,
-                fontSize: `${h.size}px`,
+                top: "-120px",
+                left: `${flower.left}%`,
+                width: `${flower.size}px`,
+                height: `${flower.size}px`,
+                animationDelay: `${flower.delay}s`,
+                animationDuration: `${flower.duration}s`,
               }}
             >
-              {h.id % 4 === 0
-                ? "🌻"
-                : h.id % 4 === 1
-                  ? "✨"
-                  : h.id % 4 === 2
-                    ? "🌼"
-                    : "💛"}
-            </span>
+              <Image
+                src="/girasol-usuario.png"
+                alt="Girasol con tallo y hoja cayendo como nieve"
+                width={flower.size}
+                height={flower.size}
+                className="w-full h-full object-contain filter drop-shadow-[0_8px_18px_rgba(0,0,0,0.18)]"
+              />
+            </div>
           ))}
         </div>
       )}
@@ -336,8 +496,8 @@ export default function CartaPage() {
 
               {/* HEADER: DREAMWORKS SHREK OFFICIAL EMBLEM */}
               <div className="relative w-full flex flex-col justify-center items-center pt-1 pb-2">
-                <span className="text-[9px] font-cinzel tracking-[0.28em] text-amber-800/80 uppercase font-semibold mb-1">
-                  DreamWorks • Edición Especial
+                <span className="text-[12px] font-cinzel tracking-[0.28em] text-amber-800/80 uppercase font-semibold mb-1">
+                  Florería Girasol • Edición Especial
                 </span>
                 <Image
                   src="/Shrek-Logo.png"
@@ -592,16 +752,6 @@ export default function CartaPage() {
                 <span className="text-[11px] font-cinzel font-semibold tracking-[0.2em] text-amber-900/80 uppercase mt-0.5">
                   Con todo mi amor
                 </span>
-
-                {/* Botón elegante para guardar la carta en el sobre */}
-                <button
-                  onClick={handleClose}
-                  className="mt-3 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-100/90 via-amber-50/90 to-amber-100/90 hover:from-amber-200 hover:to-amber-100 border border-amber-300/80 text-amber-950 font-cinzel text-[10px] font-bold tracking-widest uppercase transition-all duration-300 shadow-xs hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-1.5"
-                  title="Guardar carta en el sobre"
-                >
-                  <span>✉️</span>
-                  <span>Guardar en el sobre</span>
-                </button>
               </div>
             </div>
           </div>
