@@ -1,80 +1,98 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 
 export default function CartaPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [showCard, setShowCard] = useState(false);
-  const [hearts, setHearts] = useState<
-    { id: number; left: number; delay: number; size: number }[]
+  const [sparkles, setSparkles] = useState<
+    { id: number; left: number; delay: number; size: number; duration: number }[]
   >([]);
 
   useEffect(() => {
-    // Generate floating petals / stars when opened
+    // Generate floating luxury golden petals & motes when opened
     if (isOpen) {
-      const generated = Array.from({ length: 18 }).map((_, i) => ({
+      const generated = Array.from({ length: 26 }).map((_, i) => ({
         id: i,
-        left: Math.random() * 95,
-        delay: Math.random() * 2,
+        left: Math.random() * 92 + 4,
+        delay: Math.random() * 2.5,
         size: Math.random() * 14 + 12,
+        duration: Math.random() * 3 + 4,
       }));
-      setHearts(generated);
-      const timer = setTimeout(() => setShowCard(true), 400);
-      return () => clearTimeout(timer);
+      setSparkles(generated);
     } else {
-      setShowCard(false);
-      setHearts([]);
+      setSparkles([]);
     }
   }, [isOpen]);
 
+  const handleOpen = () => {
+    if (isOpen) return;
+    setIsOpen(true);
+    // Smooth sequence: envelope straightens and opens first, then letter smoothly glides out
+    setTimeout(() => {
+      setShowCard(true);
+    }, 450);
+  };
+
+  const handleClose = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    // Smooth sequence: letter glides down inside first, then envelope closes and returns to tilted rest
+    setShowCard(false);
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 550);
+  };
+
   const handleToggle = () => {
-    setIsOpen((prev) => !prev);
+    if (isOpen) {
+      handleClose();
+    } else {
+      handleOpen();
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f5ede3] via-[#faefe6] to-[#ebded0] flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden select-none font-sans">
-      {/* Google Fonts link for cursive typography */}
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_center,_#faf7f0_0%,_#f5eee1_50%,_#ebe0cc_100%)] flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden select-none font-sans text-stone-800">
+      {/* Google Fonts for luxury calligraphy and classic serifs */}
       <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cinzel:wght@700&family=Great+Vibes&family=Playfair+Display:ital,wght@1,600&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap");
 
-        .font-handwriting {
-          font-family: "Caveat", cursive;
+        .font-cursive {
+          font-family: "Great Vibes", "Alex Brush", cursive;
         }
-        .font-shrek {
-          font-family:
-            system-ui,
-            -apple-system,
-            sans-serif;
-          font-weight: 900;
-          letter-spacing: 0.05em;
-          text-shadow:
-            2px 2px 0px #24570d,
-            -1px -1px 0px #bbf573,
-            0 4px 10px rgba(0, 0, 0, 0.3);
+        .font-handwriting {
+          font-family: "Alex Brush", cursive;
+        }
+        .font-serif-luxury {
+          font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+        }
+        .font-cinzel {
+          font-family: "Cinzel", Georgia, serif;
         }
 
         /* 3D Envelope perspective */
         .envelope-wrapper {
-          perspective: 1200px;
+          perspective: 1400px;
         }
 
+        /* Natural gravitational swing for pendant */
         @keyframes swing {
           0%,
           100% {
-            transform: rotate(-3deg);
+            transform: rotate(-3.5deg);
           }
           50% {
-            transform: rotate(3deg);
+            transform: rotate(3.5deg);
           }
         }
 
         .animate-swing {
           transform-origin: top center;
-          animation: swing 3.5s ease-in-out infinite;
+          animation: swing 3.8s ease-in-out infinite;
         }
 
+        /* Sunflower pendant rotation */
         @keyframes spin-slow {
           0% {
             transform: rotate(0deg);
@@ -85,346 +103,465 @@ export default function CartaPage() {
         }
 
         .animate-spin-slow {
-          animation: spin-slow 10s linear infinite;
+          animation: spin-slow 14s linear infinite;
         }
 
-        @keyframes float-up {
+        /* Rhythmic Heartbeat pulse for the closed tilted envelope */
+        @keyframes envelope-heartbeat-tilted {
+          0%,
+          100% {
+            transform: rotate(-5.5deg) scale(1);
+            filter: drop-shadow(0 20px 38px rgba(180, 110, 10, 0.28));
+          }
+          14% {
+            transform: rotate(-4.8deg) scale(1.038);
+            filter: drop-shadow(0 26px 48px rgba(217, 119, 6, 0.45));
+          }
+          28% {
+            transform: rotate(-5.5deg) scale(1);
+            filter: drop-shadow(0 20px 38px rgba(180, 110, 10, 0.28));
+          }
+          42% {
+            transform: rotate(-6.2deg) scale(1.055);
+            filter: drop-shadow(0 30px 54px rgba(245, 158, 11, 0.55));
+          }
+          70% {
+            transform: rotate(-5.5deg) scale(1);
+            filter: drop-shadow(0 20px 38px rgba(180, 110, 10, 0.28));
+          }
+        }
+
+        .animate-envelope-tilted-pulse {
+          animation: envelope-heartbeat-tilted 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+        }
+
+        /* Floating yellow petals & sparkles */
+        @keyframes float-petal {
           0% {
-            transform: translateY(100vh) scale(0.6) rotate(0deg);
+            transform: translateY(105vh) scale(0.6) rotate(0deg);
             opacity: 0;
           }
-          20% {
-            opacity: 0.8;
+          15% {
+            opacity: 0.95;
+          }
+          85% {
+            opacity: 0.85;
           }
           100% {
-            transform: translateY(-20vh) scale(1.1) rotate(360deg);
+            transform: translateY(-15vh) scale(1.15) rotate(360deg);
             opacity: 0;
           }
         }
 
-        .animate-float {
-          animation: float-up 6s ease-in infinite;
+        .animate-petal {
+          animation-name: float-petal;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+        }
+
+        @keyframes wax-sun-glow {
+          0%,
+          100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 12px rgba(217, 119, 6, 0.5));
+          }
+          50% {
+            transform: scale(1.06);
+            filter: drop-shadow(0 0 22px rgba(245, 158, 11, 0.85));
+          }
+        }
+
+        .animate-sun-glow {
+          animation: wax-sun-glow 2.2s ease-in-out infinite;
         }
       `}</style>
 
-      {/* Background Floating Petals */}
+      {/* Ambient background lighting and warm gold flecks */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-amber-200/25 rounded-full blur-3xl" />
+        <div className="absolute -bottom-32 left-1/4 w-[550px] h-[550px] bg-yellow-200/30 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-amber-300/15 rounded-full blur-3xl" />
+      </div>
+
+      {/* Background Floating Luxury Yellow Petals & Stardust */}
       {isOpen && (
         <div className="fixed inset-0 pointer-events-none z-10">
-          {hearts.map((h) => (
+          {sparkles.map((h) => (
             <span
               key={h.id}
-              className="absolute text-yellow-400 animate-float drop-shadow-sm"
+              className="absolute animate-petal text-amber-500 drop-shadow-md select-none"
               style={{
                 left: `${h.left}%`,
-                bottom: "-20px",
+                bottom: "-30px",
                 animationDelay: `${h.delay}s`,
+                animationDuration: `${h.duration}s`,
                 fontSize: `${h.size}px`,
               }}
             >
-              {h.id % 3 === 0 ? "🌻" : h.id % 3 === 1 ? "✨" : "💛"}
+              {h.id % 4 === 0
+                ? "🌻"
+                : h.id % 4 === 1
+                  ? "✨"
+                  : h.id % 4 === 2
+                    ? "🌼"
+                    : "💛"}
             </span>
           ))}
         </div>
       )}
 
-      {/* Header controls */}
-      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 flex items-center gap-2">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 bg-white/70 backdrop-blur-sm px-3.5 py-1.5 rounded-full text-xs font-medium border border-stone-200 transition shadow-2xs"
-        >
-          ← Volver
-        </Link>
-        <Link
-          href="/corazon-astro"
-          className="inline-flex items-center gap-1.5 text-pink-700 hover:text-pink-900 bg-pink-50/80 backdrop-blur-sm px-3.5 py-1.5 rounded-full text-xs font-medium border border-pink-200 transition shadow-2xs"
-        >
-          🪐 Corazón Astro
-        </Link>
-      </div>
-
-      {/* Interactive Container */}
+      {/* Interactive Container (Self-contained, no external redirects) */}
       <div className="w-full max-w-lg flex flex-col items-center justify-center my-auto py-8">
-        {/* Envelope & Letter Container */}
-        <div className="envelope-wrapper relative w-[320px] sm:w-[380px] flex justify-center items-center">
-          {/* ENVELOPE (Visible when closed or animated when opened) */}
+        {/* Envelope & Letter Wrapper */}
+        <div className="envelope-wrapper relative w-[340px] sm:w-[420px] flex justify-center items-center">
+          {/* =========================================================
+              THE EXACT BOTANICAL SUNFLOWER ENVELOPE (Fiel a la foto)
+              Inicia inclinado (-5.5deg), palpita con emoción, y al presionar
+              se alinea suavemente al centro mientras la carta emerge con delicadeza.
+              ========================================================= */}
           <div
             onClick={handleToggle}
-            className={`relative w-full h-[230px] sm:h-[260px] cursor-pointer transition-all duration-700 select-none ${
+            className={`relative w-full h-[263px] sm:h-[325px] cursor-pointer transition-all duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] select-none ${
               isOpen
-                ? "scale-95 translate-y-32 sm:translate-y-40 opacity-30 hover:opacity-80"
-                : "scale-100 hover:scale-105 shadow-2xl"
+                ? "rotate-0 scale-95 translate-y-36 sm:translate-y-48 opacity-45 hover:opacity-85"
+                : "animate-envelope-tilted-pulse hover:scale-[1.02]"
             }`}
           >
-            {/* Envelope Back Body */}
-            <div className="absolute inset-0 bg-[#d97736] rounded-2xl shadow-xl overflow-hidden border border-[#b85b1e]">
-              <div className="w-full h-full bg-gradient-to-br from-[#e08343] to-[#c46524]" />
+            {/* Real Botanical Envelope Container with Natural Paper Shadow */}
+            <div className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl border border-[#d6c7b0]/70 bg-[#f7f2e7]">
+              {/* Photorealistic Envelope Back Body & Botanical Art */}
+              <Image
+                src="/sobre-recortado.jpg"
+                alt="Sobre Artesanal de Girasoles"
+                fill
+                priority
+                className="object-cover pointer-events-none"
+              />
+
+              {/* Fine gold foil edge hairline */}
+              <div className="absolute inset-1.5 border border-amber-400/25 rounded-xl pointer-events-none" />
+
+              {/* Interior Silk Lining (Revealed behind the flap when open) */}
+              <div
+                className={`absolute inset-0 bg-gradient-to-b from-[#faf6ee] to-[#ece1cc] transition-opacity duration-700 pointer-events-none ${
+                  isOpen ? "opacity-90" : "opacity-0"
+                }`}
+              >
+                <Image
+                  src="/sobre-interior.jpg"
+                  alt="Interior del Sobre"
+                  fill
+                  className="object-cover opacity-65"
+                />
+              </div>
             </div>
 
-            {/* Envelope Front Flaps (Left, Right, Bottom) */}
+            {/* Envelope Top Flap (Animated 3D Opening with Real Flap Graphic) */}
             <div
-              className="absolute inset-0 z-20 pointer-events-none"
-              style={{
-                clipPath: "polygon(0 0, 0 100%, 100% 100%, 100% 0, 50% 55%)",
-                background:
-                  "linear-gradient(135deg, #d37130 0%, #be5d1b 50%, #ad5215 100%)",
-              }}
-            />
-
-            {/* Envelope Top Flap (Animated opening) */}
-            <div
-              className="absolute top-0 left-0 right-0 h-1/2 z-30 transition-transform duration-700 origin-top rounded-t-2xl"
+              className="absolute top-0 left-0 right-0 h-[48%] z-30 transition-transform duration-700 origin-top rounded-t-2xl overflow-hidden pointer-events-none"
               style={{
                 clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                background: isOpen
-                  ? "linear-gradient(180deg, #c76624 0%, #b05316 100%)"
-                  : "linear-gradient(180deg, #e48747 0%, #cc6f2b 100%)",
                 transform: isOpen ? "rotateX(180deg)" : "rotateX(0deg)",
               }}
-            />
+            >
+              {/* Flap Outside (When closed, matches the top of the photo) */}
+              <div className="relative w-full h-[263px] sm:h-[325px]">
+                <Image
+                  src="/sobre-recortado.jpg"
+                  alt="Solapa del Sobre"
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
-            {/* Wax Seal / Heart Button */}
+              {/* Gold foil edge line on flap */}
+              <div className="absolute inset-0 border-b-2 border-amber-400/60 pointer-events-none" />
+            </div>
+
+            {/* Sello de Lacre Dorado con Aura Luminosa Pulsante (Solo cuando cerrado) */}
             {!isOpen && (
-              <div className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 flex flex-col items-center">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-600 via-rose-700 to-red-900 border-2 border-red-300/40 shadow-lg flex items-center justify-center text-white text-lg transform hover:scale-110 active:scale-95 transition">
-                  🌻
-                </div>
-                <span className="text-[10px] font-bold text-white/90 mt-1 uppercase tracking-widest drop-shadow-md">
-                  Abrir
-                </span>
+              <div
+                className="absolute z-40 pointer-events-none animate-sun-glow rounded-full"
+                style={{
+                  top: "46.5%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "72px",
+                  height: "72px",
+                }}
+              >
+                {/* Subtle radiant golden aura accentuating the seal */}
+                <div className="w-full h-full rounded-full bg-amber-400/20 blur-md" />
               </div>
             )}
           </div>
 
-          {/* THE CARD / LETTER (SLIDES OUT & GROWS) */}
+          {/* =========================================================
+              THE LUXURY GIFT CARD (Emerge suavemente del sobre)
+              ========================================================= */}
           <div
-            className={`fixed sm:absolute z-50 transition-all duration-700 ease-out origin-center flex flex-col items-center ${
+            className={`fixed sm:absolute z-50 transition-all duration-900 ease-[cubic-bezier(0.16,1,0.3,1)] origin-bottom flex flex-col items-center ${
               isOpen && showCard
-                ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+                ? "opacity-100 scale-100 -translate-y-6 sm:-translate-y-10 pointer-events-auto"
                 : isOpen
-                  ? "opacity-80 scale-75 -translate-y-16 pointer-events-none"
-                  : "opacity-0 scale-50 translate-y-20 pointer-events-none hidden"
+                  ? "opacity-0 scale-85 translate-y-24 pointer-events-none"
+                  : "opacity-0 scale-75 translate-y-32 pointer-events-none hidden"
             }`}
           >
-            {/* PHYSICAL SHREK CARD */}
-            <div className="w-[310px] sm:w-[350px] bg-white rounded-xl shadow-2xl p-6 sm:p-7 border border-stone-200/90 relative flex flex-col items-center text-center">
-              {/* Close mini button */}
+            {/* PHYSICAL JEWELRY PRESENTATION CARD */}
+            <div className="w-[325px] sm:w-[380px] bg-[#fffefb] rounded-2xl shadow-[0_25px_60px_rgba(180,83,9,0.25)] p-6 sm:p-7 border border-[#eedab8] relative flex flex-col items-center text-center overflow-hidden">
+              {/* Outer Double Filigree Gold Border */}
+              <div className="absolute inset-2.5 border border-amber-400/50 rounded-xl pointer-events-none" />
+              <div className="absolute inset-3.5 border border-amber-300/30 rounded-lg pointer-events-none" />
+
+              {/* Sunflower Corner Ornaments */}
+              <div className="absolute top-3.5 left-3.5 text-amber-600/70 text-xs select-none pointer-events-none">
+                🌻
+              </div>
+              <div className="absolute bottom-3.5 left-3.5 text-amber-600/70 text-xs select-none pointer-events-none">
+                🌻
+              </div>
+              <div className="absolute bottom-3.5 right-3.5 text-amber-600/70 text-xs select-none pointer-events-none">
+                🌻
+              </div>
+
+              {/* Botón sutil de cierre de esquina */}
               <button
-                onClick={handleToggle}
-                className="absolute top-3 right-3 text-stone-300 hover:text-stone-600 text-xs w-6 h-6 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center transition cursor-pointer"
-                title="Cerrar carta"
+                onClick={handleClose}
+                className="absolute top-2.5 right-2.5 text-amber-800/60 hover:text-amber-950 text-xs w-6 h-6 rounded-full bg-amber-100/60 hover:bg-amber-200/80 border border-amber-300/40 flex items-center justify-center transition cursor-pointer z-30"
+                title="Guardar carta en el sobre"
               >
                 ✕
               </button>
 
-              {/* SHREK OFFICIAL LOGO */}
-              <div className="relative w-full flex justify-center items-center  px-4">
+              {/* HEADER: DREAMWORKS SHREK OFFICIAL EMBLEM */}
+              <div className="relative w-full flex flex-col justify-center items-center pt-1 pb-2">
+                <span className="text-[9px] font-cinzel tracking-[0.28em] text-amber-800/80 uppercase font-semibold mb-1">
+                  DreamWorks • Edición Especial
+                </span>
                 <Image
                   src="/Shrek-Logo.png"
                   alt="DreamWorks Shrek Logo"
-                  width={240}
-                  height={90}
+                  width={220}
+                  height={80}
                   priority
-                  className="w-48 sm:w-56 h-auto object-contain drop-shadow-sm"
+                  className="w-44 sm:w-52 h-auto object-contain drop-shadow-xs"
                 />
               </div>
 
-              {/* JEWELRY DISPLAY AREA WITH CHAIN & ROTATING SUNFLOWER PENDANT */}
-              <div className="w-full relative h-[210px] sm:h-[225px] flex justify-center items-start mb-3">
-                {/* Card side cuts/holes for necklace chain */}
-                <div className="absolute top-2 left-[-28px] w-5 h-1 bg-stone-300 rounded-r-full" />
-                <div className="absolute top-2 right-[-28px] w-5 h-1 bg-stone-300 rounded-l-full" />
+              {/* JEWELRY DISPLAY AREA WITH WOVEN GOLD CHAIN & ROTATING SUNFLOWER PENDANT */}
+              <div className="w-full relative h-[215px] sm:h-[235px] flex justify-center items-start my-1">
+                {/* Card side cuts/notches with depth shadow */}
+                <div className="absolute top-2 left-[-26px] w-6 h-1.5 bg-[#451f08]/20 rounded-r-full shadow-inner" />
+                <div className="absolute top-2 right-[-26px] w-6 h-1.5 bg-[#451f08]/20 rounded-l-full shadow-inner" />
 
-                {/* SVG Gold Necklace Chain */}
+                {/* SVG Woven Gold Necklace Chain */}
                 <svg
-                  className="w-[320px] h-[110px] absolute top-0 z-10 pointer-events-none"
+                  className="w-[330px] h-[115px] absolute top-0 z-10 pointer-events-none"
                   viewBox="0 0 300 100"
                 >
                   <defs>
                     <linearGradient
-                      id="goldChain"
+                      id="luxuryGoldChain"
                       x1="0%"
                       y1="0%"
                       x2="100%"
                       y2="0%"
                     >
-                      <stop offset="0%" stopColor="#cf9f38" />
-                      <stop offset="25%" stopColor="#ffd700" />
-                      <stop offset="50%" stopColor="#ffe680" />
-                      <stop offset="75%" stopColor="#ffd700" />
-                      <stop offset="100%" stopColor="#cf9f38" />
+                      <stop offset="0%" stopColor="#b48325" />
+                      <stop offset="20%" stopColor="#f5d77f" />
+                      <stop offset="40%" stopColor="#fff3b0" />
+                      <stop offset="60%" stopColor="#ffd700" />
+                      <stop offset="80%" stopColor="#f5d77f" />
+                      <stop offset="100%" stopColor="#b48325" />
                     </linearGradient>
+                    <filter
+                      id="goldGlow"
+                      x="-20%"
+                      y="-20%"
+                      width="140%"
+                      height="140%"
+                    >
+                      <feDropShadow
+                        dx="0"
+                        dy="1.5"
+                        stdDeviation="1"
+                        floodColor="#78450a"
+                        floodOpacity="0.4"
+                      />
+                    </filter>
                   </defs>
                   {/* Left chain strand */}
                   <path
-                    d="M 10 10 Q 150 105 150 85"
+                    d="M 12 10 Q 150 110 150 88"
                     fill="none"
-                    stroke="url(#goldChain)"
-                    strokeWidth="4.5"
-                    strokeDasharray="2,2"
-                    className="drop-shadow-xs"
+                    stroke="url(#luxuryGoldChain)"
+                    strokeWidth="4"
+                    strokeDasharray="2,2.5"
+                    filter="url(#goldGlow)"
                   />
                   {/* Right chain strand */}
                   <path
-                    d="M 290 10 Q 150 105 150 85"
+                    d="M 288 10 Q 150 110 150 88"
                     fill="none"
-                    stroke="url(#goldChain)"
-                    strokeWidth="4.5"
-                    strokeDasharray="2,2"
-                    className="drop-shadow-xs"
+                    stroke="url(#luxuryGoldChain)"
+                    strokeWidth="4"
+                    strokeDasharray="2,2.5"
+                    filter="url(#goldGlow)"
                   />
                 </svg>
 
-                {/* PENDANT CONTAINER (Interactivity & Swing) */}
-                <div className="absolute top-[70px] z-20 flex flex-col items-center animate-swing group cursor-pointer">
-                  {/* Gold Bail / Hook */}
-                  <div className="w-3.5 h-10 bg-gradient-to-b from-[#ffe57f] via-[#d4af37] to-[#8c6b12] rounded-t-sm border border-[#a88219] shadow-sm mb-[-10px] z-30" />
+                {/* PENDANT CONTAINER (Natural Gravity Swing & Hover Interactivity) */}
+                <div className="absolute top-[72px] z-20 flex flex-col items-center animate-swing group cursor-pointer">
+                  {/* Gold Jewelry Bail / Hook with Bezel Detail */}
+                  <div className="w-4 h-10 bg-gradient-to-b from-[#fff2b2] via-[#e5b838] to-[#996f12] rounded-t-sm border border-[#b88c1b] shadow-sm mb-[-11px] z-30 relative flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/80 shadow-xs" />
+                  </div>
 
-                  {/* LARGE ROTATING SUNFLOWER (SVG High-Definition Petals) */}
-                  <div className="relative w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 drop-shadow-xl">
+                  {/* MASTERPIECE ROTATING SUNFLOWER PENDANT */}
+                  <div className="relative w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 drop-shadow-[0_12px_24px_rgba(161,98,7,0.35)]">
                     <svg
                       viewBox="0 0 200 200"
                       className="w-full h-full animate-spin-slow"
                     >
                       <defs>
-                        {/* Outer Petal Gradient */}
+                        {/* Outer Petal Gradient: Sunlit Gold */}
                         <linearGradient
-                          id="petalGrad1"
+                          id="sunlitPetalGrad1"
+                          x1="0%"
+                          y1="0%"
+                          x2="0%"
+                          y2="100%"
+                        >
+                          <stop offset="0%" stopColor="#fff9c4" />
+                          <stop offset="25%" stopColor="#ffd600" />
+                          <stop offset="70%" stopColor="#ff9100" />
+                          <stop offset="100%" stopColor="#e65100" />
+                        </linearGradient>
+
+                        {/* Inner Petal Gradient: Deep Saffron */}
+                        <linearGradient
+                          id="sunlitPetalGrad2"
                           x1="0%"
                           y1="0%"
                           x2="0%"
                           y2="100%"
                         >
                           <stop offset="0%" stopColor="#fff176" />
-                          <stop offset="30%" stopColor="#ffd600" />
-                          <stop offset="70%" stopColor="#ffab00" />
-                          <stop offset="100%" stopColor="#ff8f00" />
+                          <stop offset="35%" stopColor="#ffb300" />
+                          <stop offset="100%" stopColor="#bf360c" />
                         </linearGradient>
 
-                        {/* Inner Petal Gradient */}
-                        <linearGradient
-                          id="petalGrad2"
-                          x1="0%"
-                          y1="0%"
-                          x2="0%"
-                          y2="100%"
-                        >
-                          <stop offset="0%" stopColor="#ffee58" />
-                          <stop offset="40%" stopColor="#fbc02d" />
-                          <stop offset="100%" stopColor="#e65100" />
-                        </linearGradient>
-
-                        {/* Seed Center Texture */}
+                        {/* Seed Center Texture (Fibonacci Inspired) */}
                         <pattern
-                          id="seedGrid"
+                          id="seedGridGold"
                           width="6"
                           height="6"
                           patternUnits="userSpaceOnUse"
                         >
-                          <rect width="6" height="6" fill="#1b0e07" />
+                          <rect width="6" height="6" fill="#1f0e06" />
                           <rect
                             x="0.5"
                             y="0.5"
                             width="5"
                             height="5"
-                            fill="#2d170b"
-                            stroke="#4e2c17"
+                            fill="#301509"
+                            stroke="#5c2910"
                             strokeWidth="0.5"
                           />
                           <circle
                             cx="3"
                             cy="3"
                             r="1.2"
-                            fill="#8d5638"
-                            opacity="0.8"
+                            fill="#d97706"
+                            opacity="0.9"
                           />
                         </pattern>
 
                         <radialGradient
-                          id="centerShade"
-                          cx="40%"
-                          cy="40%"
-                          r="60%"
+                          id="centerDomeShadow"
+                          cx="38%"
+                          cy="38%"
+                          r="62%"
                         >
                           <stop
                             offset="0%"
-                            stopColor="#3d1f0f"
-                            stopOpacity="0.3"
+                            stopColor="#54230c"
+                            stopOpacity="0.25"
                           />
                           <stop
-                            offset="70%"
-                            stopColor="#120803"
-                            stopOpacity="0.8"
+                            offset="65%"
+                            stopColor="#1c0b04"
+                            stopOpacity="0.85"
                           />
                           <stop
                             offset="100%"
-                            stopColor="#080301"
-                            stopOpacity="0.95"
+                            stopColor="#080201"
+                            stopOpacity="0.98"
                           />
                         </radialGradient>
                       </defs>
 
                       <g transform="translate(100, 100)">
-                        {/* Layer 1: 18 Outer Petals (Pointed & Wide) */}
+                        {/* Layer 1: 18 Outer Pointed Petals */}
                         {[
                           0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220,
                           240, 260, 280, 300, 320, 340,
                         ].map((angle) => (
                           <g
-                            key={`outer-${angle}`}
+                            key={`outer-petal-${angle}`}
                             transform={`rotate(${angle})`}
                           >
-                            {/* Petal shape extending from center out to 92px */}
                             <path
-                              d="M 0,-92 C 14,-72 17,-38 8,-24 C 0,-28 -8,-28 -8,-24 C -17,-38 -14,-72 0,-92 Z"
-                              fill="url(#petalGrad1)"
-                              stroke="#e68a00"
-                              strokeWidth="0.75"
+                              d="M 0,-93 C 15,-72 18,-38 8,-24 C 0,-28 -8,-28 -8,-24 C -18,-38 -15,-72 0,-93 Z"
+                              fill="url(#sunlitPetalGrad1)"
+                              stroke="#c26300"
+                              strokeWidth="0.8"
                             />
-                            {/* Petal central groove/vein */}
+                            {/* Petal Spine Highlight */}
                             <path
-                              d="M 0,-86 L 0,-34"
-                              stroke="#ffb300"
+                              d="M 0,-88 L 0,-32"
+                              stroke="#fff3b0"
                               strokeWidth="1.2"
-                              opacity="0.8"
+                              opacity="0.85"
                             />
                           </g>
                         ))}
 
-                        {/* Layer 2: 18 Inner Secondary Petals (Interleaved at 10deg) */}
+                        {/* Layer 2: 18 Interleaved Inner Petals */}
                         {[
                           10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210, 230,
                           250, 270, 290, 310, 330, 350,
                         ].map((angle) => (
                           <g
-                            key={`inner-${angle}`}
+                            key={`inner-petal-${angle}`}
                             transform={`rotate(${angle})`}
                           >
                             <path
-                              d="M 0,-85 C 12,-66 14,-36 6,-24 C 0,-27 -6,-27 -6,-24 C -14,-36 -12,-66 0,-85 Z"
-                              fill="url(#petalGrad2)"
-                              stroke="#d97706"
-                              strokeWidth="0.5"
+                              d="M 0,-86 C 13,-66 15,-36 6,-24 C 0,-27 -6,-27 -6,-24 C -15,-36 -13,-66 0,-86 Z"
+                              fill="url(#sunlitPetalGrad2)"
+                              stroke="#ad4300"
+                              strokeWidth="0.6"
                             />
                           </g>
                         ))}
 
-                        {/* Center Dark Textured Seed Disk */}
+                        {/* Center Textured Seed Disk */}
                         <circle
                           r="32"
-                          fill="url(#seedGrid)"
-                          stroke="#45220e"
+                          fill="url(#seedGridGold)"
+                          stroke="#4a1f0a"
                           strokeWidth="2.5"
                         />
-                        {/* Radial Shadow overlay for 3D convex dome look */}
-                        <circle r="32" fill="url(#centerShade)" />
-                        {/* Outer dark rim */}
+                        {/* 3D Convex Dome Shading */}
+                        <circle r="32" fill="url(#centerDomeShadow)" />
+                        {/* Outer Dark Gold Bezel */}
                         <circle
                           r="33"
                           fill="none"
-                          stroke="#1a0a03"
+                          stroke="#e5a122"
                           strokeWidth="1"
-                          opacity="0.6"
+                          opacity="0.75"
                         />
                       </g>
                     </svg>
@@ -432,13 +569,39 @@ export default function CartaPage() {
                 </div>
               </div>
 
-              {/* HANDWRITTEN QUOTE IN SPANISH */}
-              <div className="px-2 pt-2 pb-1 space-y-1">
-                <p className="font-handwriting text-xl sm:text-2xl text-stone-900 leading-[1.35] tracking-wide antialiased">
-                  Vi esta flor y pensé en ti porque es bonita, en realidad a mi
-                  no me gusta, pero creí que a ti si te gustaría, porque tu si
-                  eres bonita
+              {/* ROMANTIC CALLIGRAPHIC LOVE LETTER (Deep Espresso Ink) */}
+              <div className="w-full px-2 sm:px-3 pt-2 pb-1 flex flex-col items-center">
+                {/* Decorative gold quote mark */}
+                <span className="text-amber-500/50 text-2xl font-serif-luxury leading-none select-none">
+                  “
+                </span>
+
+                <p className="font-cursive text-2xl sm:text-[27px] text-[#29160d] leading-[1.3] tracking-wide antialiased my-1 drop-shadow-2xs">
+                  Vi esta flor y pensé en ti porque es bonita; en realidad a mí
+                  no me gusta, pero creí que a ti sí te gustaría... porque tú sí
+                  eres bonita.
                 </p>
+
+                {/* Elegant sunflower separator flourish */}
+                <div className="flex items-center justify-center gap-2 text-amber-500/80 py-1 select-none">
+                  <span className="w-8 h-[1px] bg-gradient-to-r from-transparent to-amber-400" />
+                  <span className="text-sm">🌻</span>
+                  <span className="w-8 h-[1px] bg-gradient-to-l from-transparent to-amber-400" />
+                </div>
+
+                <span className="text-[11px] font-cinzel font-semibold tracking-[0.2em] text-amber-900/80 uppercase mt-0.5">
+                  Con todo mi amor
+                </span>
+
+                {/* Botón elegante para guardar la carta en el sobre */}
+                <button
+                  onClick={handleClose}
+                  className="mt-3 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-100/90 via-amber-50/90 to-amber-100/90 hover:from-amber-200 hover:to-amber-100 border border-amber-300/80 text-amber-950 font-cinzel text-[10px] font-bold tracking-widest uppercase transition-all duration-300 shadow-xs hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-1.5"
+                  title="Guardar carta en el sobre"
+                >
+                  <span>✉️</span>
+                  <span>Guardar en el sobre</span>
+                </button>
               </div>
             </div>
           </div>
