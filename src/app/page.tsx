@@ -20,6 +20,12 @@ export default function Home() {
           >
             Ver Carta / Catálogo 💐
           </Link>
+          <Link
+            href="/corazon-astro"
+            className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-700 via-pink-600 to-rose-600 text-white font-medium hover:opacity-90 transition shadow-md hover:shadow-lg shadow-pink-500/20"
+          >
+            🪐 Corazón Astro ✨
+          </Link>
         </div>
       </div>
     </main>

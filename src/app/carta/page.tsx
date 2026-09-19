@@ -128,12 +128,18 @@ export default function CartaPage() {
       )}
 
       {/* Header controls */}
-      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 flex items-center gap-2">
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 bg-white/70 backdrop-blur-sm px-3.5 py-1.5 rounded-full text-xs font-medium border border-stone-200 transition shadow-2xs"
         >
           ← Volver
+        </Link>
+        <Link
+          href="/corazon-astro"
+          className="inline-flex items-center gap-1.5 text-pink-700 hover:text-pink-900 bg-pink-50/80 backdrop-blur-sm px-3.5 py-1.5 rounded-full text-xs font-medium border border-pink-200 transition shadow-2xs"
+        >
+          🪐 Corazón Astro
         </Link>
       </div>
 
