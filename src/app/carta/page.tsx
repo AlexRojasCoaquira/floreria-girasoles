@@ -369,20 +369,21 @@ export default function CartaPage() {
           ))}
         </div>
       )}
-
-      <div className="flex flex-col items-center justify-center ">
-        <div className="relative group hover:scale-105 transition-transform duration-300 drop-shadow-[0_12px_28px_rgba(217,119,6,0.35)]">
-          <Image
-            src="/logo-jazmin.png"
-            alt="Florería Girasol"
-            width={240}
-            height={240}
-            priority
-            unoptimized
-            className="w-64 sm:w-72 h-auto object-contain  select-none pointer-events-none"
-          />
+      {!isOpen && (
+        <div className="flex flex-col items-center justify-center ">
+          <div className="relative group hover:scale-105 transition-transform duration-300 drop-shadow-[0_12px_28px_rgba(217,119,6,0.35)]">
+            <Image
+              src="/logo-jazmin.png"
+              alt="Florería Girasol"
+              width={240}
+              height={240}
+              priority
+              unoptimized
+              className="w-64 sm:w-72 h-auto object-contain  select-none pointer-events-none"
+            />
+          </div>
         </div>
-      </div>
+      )}
       {/* Interactive Container (Self-contained, no external redirects) */}
       <div className="w-full max-w-lg flex flex-col items-center justify-center my-auto py-8">
         {/* Logo de Florería Girasol arriba del sobre */}
@@ -512,15 +513,15 @@ export default function CartaPage() {
               {/* HEADER: DREAMWORKS SHREK OFFICIAL EMBLEM */}
               <div className="relative w-full flex flex-col justify-center items-center pt-1 pb-2">
                 <span className="text-[12px] font-cinzel tracking-[0.28em] text-amber-800/80 uppercase font-semibold mb-1">
-                  Florería Girasol • Edición Especial
+                  Edición Especial
                 </span>
                 <Image
-                  src="/Shrek-Logo.png"
-                  alt="DreamWorks Shrek Logo"
+                  src="/logo-jazmin.png"
+                  alt="Florería Girasol"
                   width={220}
                   height={80}
                   priority
-                  className="w-44 sm:w-52 h-auto object-contain drop-shadow-xs"
+                  className="w-64 sm:w-72 h-auto object-contain drop-shadow-xs"
                 />
               </div>
 
