@@ -24,7 +24,7 @@ export default function CartaPage() {
   useEffect(() => {
     // Nevada infinita de girasoles: orden 100% ALEATORIO de caída desde arriba (sin barrido de izq a der)
     if (isOpen) {
-      const count = 40;
+      const count = 25;
       // Posiciones horizontales que cubren la pantalla de forma equilibrada
       const positions = Array.from(
         { length: count },
@@ -42,7 +42,7 @@ export default function CartaPage() {
         left: positions[i],
         // Entrada escalonada natural desde arriba
         delay: i * 0.22 + Math.random() * 0.16,
-        size: Math.floor(Math.random() * 100 + 54), // 54px a 82px
+        size: Math.floor(Math.random() * 80 + 54), // 54px a 82px
         duration: Math.random() * 1.6 + 5.6, // Caída suave de ~5.6s a 7.2s
         variant: Math.floor(Math.random() * 3), // Variante de bamboleo aleatoria
       }));
@@ -370,8 +370,23 @@ export default function CartaPage() {
         </div>
       )}
 
+      <div className="flex flex-col items-center justify-center ">
+        <div className="relative group hover:scale-105 transition-transform duration-300 drop-shadow-[0_12px_28px_rgba(217,119,6,0.35)]">
+          <Image
+            src="/logo-jazmin.png"
+            alt="Florería Girasol"
+            width={240}
+            height={240}
+            priority
+            unoptimized
+            className="w-64 sm:w-72 h-auto object-contain  select-none pointer-events-none"
+          />
+        </div>
+      </div>
       {/* Interactive Container (Self-contained, no external redirects) */}
       <div className="w-full max-w-lg flex flex-col items-center justify-center my-auto py-8">
+        {/* Logo de Florería Girasol arriba del sobre */}
+
         {/* Envelope & Letter Wrapper */}
         <div className="envelope-wrapper relative w-[340px] sm:w-[420px] flex justify-center items-center">
           {/* =========================================================
